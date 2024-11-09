@@ -1,0 +1,23 @@
+<form>
+  <label>
+    Admin Passwort:
+    <br>
+    <input type="password" autocomplete="current-password" null-tracker="password">
+  </label>
+
+  <null-request null="send" null-tracks="password">
+    <input type="submit" value="Absenden">
+
+    <script null-processor>
+      const { verifyLogin } = require("./auth.js");
+
+      return (req, res) => {
+        return verifyLogin(req.body.password, res);
+      };
+    </script>
+
+    <script null-handler>
+      return s => { if (s) navigate("/"); };
+    </script>
+  </null-request>
+</form>

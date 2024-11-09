@@ -1,0 +1,15 @@
+{
+  "name": "monopoly-winter-2024",
+  "version": "1.0.0",
+  "description": "McCommunism",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gXLg",
+  "license": "MIT",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "nulls": "^1.7.1"
+  }
+}

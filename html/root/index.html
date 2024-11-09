@@ -1,0 +1,120 @@
+<div>
+  <h1>Monopoly Pool</h1>
+  Herzlich willkommen bei Monopoly Pool!
+  <br>
+  Die Chancen, etwas Großes in McDonald's Monopoly
+  zu gewinnen sind ziemlich gering...
+  Jedoch steigen die Chancen bei einer sehr großen Anzahl
+  an Coupons!
+  <br>
+  Ich stelle dir vor: <b>Monopoly Pool</b>!
+  <br>
+  Gebe alle deine Coupons hier ab, damit die
+  Wahrscheinlichkeit, eine komplette Straße zu
+  sammeln, deutlich steigt. Der Gewinn wird dann
+  an alle Teilnehmer ausgeschüttet, unabhändig davon,
+  ob dein Coupon etwas gewonnen hat.
+  <br>
+  Zwar kriegst du beim Gewinn nicht die ganze Summe,
+  aber immerhin mehr, als wenn du gar nichts gewinnst!
+  <br>
+  Bisher abgegebene Coupons:
+  <b><null-data null="given">
+    <script null-processor>
+      const fs = require("fs");
+      return req => {
+        let j;
+        try {
+          j = JSON.parse(fs.readFileSync("./data/codes.json"));
+        } catch {
+          j = { "used": [], "waiting": {}, "part": {} };
+        }
+        return Object.keys(j.waiting).length + j.used.length;
+      };
+    </script>
+  </null-data></b>
+</div>
+
+<form style="border: black 1px solid; padding: 10px; margin: 10px; border-radius: 10px;">
+  <label>
+    Deine Email, um beim Gewinn Konaktiert zu werden:
+    <br>
+    <input type="email" autocomplete="email" null-tracker="email">
+  </label>
+  <br>
+  <br>
+
+  <label>
+    Dein 10-stelliger Monopoly Code:
+    <br>
+    <input type="text" autocomplete="off" null-tracker="code">
+  </label>
+  <br>
+  <br>
+
+  <null-request null="send" null-tracks="email,code">
+    <input type="submit" value="Absenden">
+
+    <script null-processor>
+      const fs = require("fs");
+
+      return req => {
+        const email = req.body.email ?? "";
+        const code = (req.body.code ?? "").trim().toUpperCase();
+
+        if (email.length == 0 || email.length > 254) {
+          return { "error": "Email nicht angegeben oder zu lang" };
+        }
+
+        if (code.length != 10) {
+          return { "error": "Code nicht angegeben oder hat falsche Länge" };
+        }
+
+        let j;
+        try {
+          j = JSON.parse(fs.readFileSync("./data/codes.json"));
+        } catch {
+          j = { "used": [], "waiting": {}, "part": {} };
+        }
+
+        if (j.used.includes(code) || code in j.waiting) {
+          return { "error": "Code ist schon eingelöst" };
+        }
+
+        j.waiting[code] = email;
+        fs.writeFileSync("./data/codes.json", JSON.stringify(j));
+        return { "error": null };
+
+      };
+    </script>
+
+    <script null-handler>
+      return s => {
+        if (s.error == null) {
+          alert("Danke für die Teilnahme!");
+        } else {
+          alert("Fehler: " + s.error);
+        }
+      };
+    </script>
+  </null-request>
+</form>
+
+<hr>
+
+<div>
+  <null-container null="content" null-provider="req => req.auth?'owner':(req.body.path=='/admin'?'admin':'guest')">
+  </null-container>
+</div>
+
+<hr>
+
+<div style="font-size: 10px;">
+  Diese Aktion ist nicht mit McDonald's affiliert.
+  Alle Rechte auf die Marke bleiben bei dem registriertem
+  Besitzer.
+  <br>
+  Ich habe weder Anspruch auf den Firmennamen "McDonald's"
+  noch auf andere mit dieser Firma verbundenen Namen, die
+  hier genannt wurden.
+</div>

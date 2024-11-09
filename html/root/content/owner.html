@@ -1,0 +1,67 @@
+<null-data null="codes">
+  <script null-processor>
+    const fs = require("fs");
+    return req => {
+      let j;
+      try {
+        j = JSON.parse(fs.readFileSync("./data/codes.json"));
+      } catch {
+        j = { "used": [], "waiting": {}, "part": {} };
+      }
+      return Object.keys(j.waiting);
+    };
+  </script>
+  <script null-parser>
+    return s => s.join("<br>");
+  </script>
+</null-data>
+
+<hr>
+
+<form>
+  <label>
+    Eingegebener Code (mit Minus, falls ungültig):
+    <br>
+    <input type="text" autocomplete="off" null-tracker="code">
+  </label>
+
+  <null-request null="validate" null-tracks="code">
+    <input type="submit" value="Einlösen">
+
+    <script null-processor>
+      const fs = require("fs");
+
+      return req => {
+        let code = req.body.code ?? "";
+        if (code.length == 0) return;
+
+        let j;
+        try {
+          j = JSON.parse(fs.readFileSync("./data/codes.json"));
+        } catch {
+          j = { "used": [], "waiting": {}, "part": {} };
+        }
+
+        let rem = false;
+        if (code.startsWith("-")) {
+          code = code.slice(1);
+          rem = true;
+        }
+
+        j.used.push(code);
+        const email = j.waiting[code];
+        delete j.waiting[code];
+
+        if (!rem && email != null) {
+          j.part[email] = (j.part[email] ?? 0) + 1;
+        }
+        fs.writeFileSync("./data/codes.json", JSON.stringify(j));
+      };
+    </script>
+
+    <script null-handler>
+      return () => { alert("Okay"); window.location.reload(); };
+    </script>
+  </null-request>
+</form>
+

@@ -1,0 +1,5 @@
+{
+  "record": "monopoly.gxlg.dev",
+  "run": "npm start {port}",
+  "plugins": ["shell", "screen"]
+}

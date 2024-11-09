@@ -15,5 +15,5 @@ nulls({
   "static": "./static",
   "ready": () => console.log("Server up!"),
   "port": parseInt(process.argv[2] ?? 31337),
-  //"https": true
+  "https": true
 });

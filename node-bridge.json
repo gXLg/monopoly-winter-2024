@@ -1,5 +1,5 @@
 {
   "record": "monopoly.gxlg.dev",
-  "run": "npm start {port}",
+  "run": "npx nodemon index.js -w . -i ./data -- {port}",
   "plugins": ["shell", "screen"]
 }

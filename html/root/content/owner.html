@@ -30,33 +30,36 @@
 
     <script null-processor>
       const fs = require("fs");
+      const lock = require("./lock.js");
 
-      return req => {
-        if (req.auth == null) return;
-        let code = req.body.code ?? "";
-        if (code.length == 0) return;
+      return async req => {
+        return await lock(() => {
+          if (req.auth == null) return;
+          let code = req.body.code ?? "";
+          if (code.length == 0) return;
 
-        let j;
-        try {
-          j = JSON.parse(fs.readFileSync("./data/codes.json"));
-        } catch {
-          j = { "used": [], "waiting": {}, "part": {} };
-        }
+          let j;
+          try {
+            j = JSON.parse(fs.readFileSync("./data/codes.json"));
+          } catch {
+            j = { "used": [], "waiting": {}, "part": {} };
+          }
 
-        let rem = false;
-        if (code.startsWith("-")) {
-          code = code.slice(1);
-          rem = true;
-        }
+          let rem = false;
+          if (code.startsWith("-")) {
+            code = code.slice(1);
+            rem = true;
+          }
 
-        j.used.push(code);
-        const email = j.waiting[code];
-        delete j.waiting[code];
+          j.used.push(code);
+          const email = j.waiting[code];
+          delete j.waiting[code];
 
-        if (!rem && email != null) {
-          j.part[email] = (j.part[email] ?? 0) + 1;
-        }
-        fs.writeFileSync("./data/codes.json", JSON.stringify(j));
+          if (!rem && email != null) {
+            j.part[email] = (j.part[email] ?? 0) + 1;
+          }
+          fs.writeFileSync("./data/codes.json", JSON.stringify(j));
+        });
       };
     </script>
 

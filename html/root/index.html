@@ -57,33 +57,42 @@
 
     <script null-processor>
       const fs = require("fs");
+      const lock = require("./lock.js");
 
-      return req => {
-        const email = req.body.email ?? "";
-        const code = (req.body.code ?? "").trim().toUpperCase();
+      return async req => {
 
-        if (email.length == 0 || email.length > 254) {
-          return { "error": "Email nicht angegeben oder zu lang" };
-        }
+        return await lock(() => {
+          const email = req.body.email ?? "";
+          const code = (req.body.code ?? "").trim().toUpperCase();
 
-        if (code.length != 10) {
-          return { "error": "Code nicht angegeben oder hat falsche Länge" };
-        }
+          if (email.length == 0 || email.length > 254) {
+            return { "error": "Email nicht angegeben oder zu lang" };
+          }
 
-        let j;
-        try {
-          j = JSON.parse(fs.readFileSync("./data/codes.json"));
-        } catch {
-          j = { "used": [], "waiting": {}, "part": {} };
-        }
+          if (code.length != 10) {
+            return { "error": "Code nicht angegeben oder hat falsche Länge" };
+          }
 
-        if (j.used.includes(code) || code in j.waiting) {
-          return { "error": "Code ist schon eingelöst" };
-        }
+          const reg = /^[0-9A-Z]{10}$/;
+          if (!reg.test(code)) {
+            return { "error": "Code enthält ungültige Zeichen!" };
+          }
 
-        j.waiting[code] = email;
-        fs.writeFileSync("./data/codes.json", JSON.stringify(j));
-        return { "error": null };
+          let j;
+          try {
+            j = JSON.parse(fs.readFileSync("./data/codes.json"));
+          } catch {
+            j = { "used": [], "waiting": {}, "part": {} };
+          }
+
+          if (j.used.includes(code) || code in j.waiting) {
+            return { "error": "Code ist schon eingelöst" };
+          }
+
+          j.waiting[code] = email;
+          fs.writeFileSync("./data/codes.json", JSON.stringify(j));
+          return { "error": null };
+        });
 
       };
     </script>

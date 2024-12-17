@@ -1,0 +1,8 @@
+{
+  "ram": 50,
+  "record": "monopoly.gxlg.dev",
+  "setup": [
+    "npm install -g nodemon"
+  ],
+  "start": "npx nodemon index.js -w . -i ./data -- {port}",
+}

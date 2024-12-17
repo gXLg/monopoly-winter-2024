@@ -1,5 +1,6 @@
 {
-  "ram": 700,
+  "ram": 200,
   "record": "monopoly.gxlg.dev",
-  "start": "node ."
+  "setup": ["sudo npm install -g nodemon"],
+  "start": "npx nodemon -w . -i ./data --max-old-space-size=200 index.js {port}"
 }

@@ -1,5 +1,5 @@
 {
-  "ram": 50,
+  "ram": 700,
   "record": "monopoly.gxlg.dev",
   "setup": [
     "npm install -g nodemon"
